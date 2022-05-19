@@ -8,9 +8,9 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @SpringBootApplication(exclude = [SecurityAutoConfiguration::class])
 @EnableMongoRepositories
 class BucketsApplication(
-//	@Autowired private val defaultItemRepo: DefaultItemRepo,
+// 	@Autowired private val defaultItemRepo: DefaultItemRepo,
 )
 
 fun main(args: Array<String>) {
-	runApplication<BucketsApplication>(*args)
+    runApplication<BucketsApplication>(*args)
 }

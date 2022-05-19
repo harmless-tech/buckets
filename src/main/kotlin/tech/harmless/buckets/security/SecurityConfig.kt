@@ -10,7 +10,7 @@ import tech.harmless.buckets.error.FailedAuthenticationEntryPoint
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig: WebSecurityConfigurerAdapter() {
+class SecurityConfig : WebSecurityConfigurerAdapter() {
     override fun configure(security: HttpSecurity) {
         security.httpBasic().disable()
             .authorizeRequests { a ->
