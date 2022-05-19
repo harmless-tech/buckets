@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>User</title>
+</head>
+<body>
+    <div sec:authorize="isAuthenticated()">
+        <p>Username: <span th:text="${login}" /></p>
+        <p>Id: <span th:text="${id}" /></p>
+        <p>Avatar: <img width="32" height="32" th:href="${avatar_url}" /></p>
+        <p>Two Factor? <span th:text="${two_factor_authentication}"></span></p>
+        <a th:href="${html_url}">Profile</a>
+    </div>
+</body>
+</html>
