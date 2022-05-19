@@ -1,7 +1,7 @@
 package tech.harmless.buckets.security
 
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
@@ -10,13 +10,15 @@ import tech.harmless.buckets.error.FailedAuthenticationEntryPoint
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true)
 class SecurityConfig : WebSecurityConfigurerAdapter() {
     override fun configure(security: HttpSecurity) {
         security.httpBasic().disable()
+            .csrf()
+            .and()
             .authorizeRequests { a ->
-                a
-                    .antMatchers(HttpMethod.GET, "/", "/error/**", "/login/**").permitAll()
-                    .anyRequest().authenticated()
+                // Security is handled by the @Secured annotation on/in controllers.
+                a.anyRequest().permitAll()
             }
             .exceptionHandling { e ->
                 e.authenticationEntryPoint(FailedAuthenticationEntryPoint())
