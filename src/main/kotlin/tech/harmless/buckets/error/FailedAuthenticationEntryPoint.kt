@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class FailedAuthenticationEntryPoint : AuthenticationEntryPoint {
+
     override fun commence(
         request: HttpServletRequest,
         response: HttpServletResponse,

@@ -16,6 +16,7 @@ import tech.harmless.buckets.util.Role
 @Controller
 @Secured(Role.USER, Role.ADMIN)
 class UserController {
+
     @GetMapping("/user")
     fun getUser(@AuthenticationPrincipal principal: OAuth2User, model: ModelMap): String {
         model.mergeAttributes(principal.attributes)

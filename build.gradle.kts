@@ -27,11 +27,28 @@ repositories {
 extra["springCloudVersion"] = "2021.0.2"
 
 dependencies {
+    implementation("org.ehcache:ehcache")
+    implementation("javax.cache:cache-api")
+
+    if (
+        System.getProperty("os.name").toLowerCase().contains("mac") &&
+        System.getProperty("os.arch").toLowerCase().contains("aarch64")
+    ) {
+        implementation("io.netty:netty-resolver-dns-native-macos") {
+            artifact {
+                classifier = "osx-aarch_64"
+            }
+        }
+    }
+
+    // Spring Starter
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
