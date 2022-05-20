@@ -29,6 +29,7 @@ extra["springCloudVersion"] = "2021.0.2"
 dependencies {
     implementation("org.ehcache:ehcache")
     implementation("javax.cache:cache-api")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
 
     if (
         System.getProperty("os.name").toLowerCase().contains("mac") &&
@@ -56,9 +57,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     implementation("org.springframework.session:spring-session-core")
     implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity5")
-    compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-    annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.springframework.security:spring-security-test")

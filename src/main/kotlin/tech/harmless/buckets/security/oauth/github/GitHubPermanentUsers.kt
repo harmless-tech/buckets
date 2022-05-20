@@ -1,15 +1,16 @@
 package tech.harmless.buckets.security.oauth.github
 
+import tech.harmless.buckets.config.Config
 import tech.harmless.buckets.util.Tuple
 
-object GitHubAdmins {
+object GitHubPermanentUsers {
     val usernames: Array<String>
     val ids: Array<String>
     val organizations: Array<String>
     val teams: Array<Tuple<String, String>>
 
     init {
-        val env1 = System.getenv("GH_ADMIN_USERNAMES")
+        val env1 = System.getenv("${Config.ENV_PREFIX}GH_PUSER_USERNAMES")
         usernames = if (env1 != null) {
             val usernames = env1.split(",").map { user -> user.trim() }
             usernames.toTypedArray()
@@ -17,7 +18,7 @@ object GitHubAdmins {
             arrayOf()
         }
 
-        val env2 = System.getenv("GH_ADMIN_IDS")
+        val env2 = System.getenv("${Config.ENV_PREFIX}GH_PUSER_IDS")
         ids = if (env2 != null) {
             val ids = env2.split(",").map { id -> id.trim() }
             ids.toTypedArray()
@@ -25,7 +26,7 @@ object GitHubAdmins {
             arrayOf()
         }
 
-        val env3 = System.getenv("GH_ADMIN_ORGS")
+        val env3 = System.getenv("${Config.ENV_PREFIX}GH_PUSER_ORGS")
         organizations = if (env3 != null) {
             val o = env3.split(",").map { org -> org.trim() }
             o.toTypedArray()
@@ -33,7 +34,7 @@ object GitHubAdmins {
             arrayOf()
         }
 
-        val env4 = System.getenv("GH_ADMIN_TEAMS")
+        val env4 = System.getenv("${Config.ENV_PREFIX}GH_PUSER_TEAMS")
         teams = if (env4 != null) {
             val t = env4.split(",").map { c ->
                 val s = c.trim().split("&")

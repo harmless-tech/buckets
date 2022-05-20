@@ -1,5 +1,6 @@
 package tech.harmless.buckets.security.oauth
 
+import mu.KLogging
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -17,10 +18,11 @@ import org.springframework.security.oauth2.core.OAuth2Error
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import tech.harmless.buckets.security.oauth.github.GitHubAdmins
+import tech.harmless.buckets.security.oauth.github.GitHubPermanentUsers
 
 @Configuration
 class OAuth2UserApprovalHandler {
+    companion object : KLogging()
 
     @Bean
     fun rest(clients: ClientRegistrationRepository, auths: OAuth2AuthorizedClientRepository): WebClient {
@@ -36,6 +38,7 @@ class OAuth2UserApprovalHandler {
         return OAuth2UserService<OAuth2UserRequest, OAuth2User> { request ->
             val user = delegate.loadUser(request)
             if ("github" != request.clientRegistration.registrationId) {
+                logger.warn { "Non GitHub OAuth2 method (${request.clientRegistration.registrationId}) was used, Buckets does not current support this." }
                 throw OAuth2AuthenticationException(
                     OAuth2Error(
                         "access_denied",
@@ -46,17 +49,18 @@ class OAuth2UserApprovalHandler {
             }
 
             // Handle permanent users
+            val loginPermUser = "User ${user.attributes["login"]} with id ${user.name} as logged in has a permanent user."
             if (
-                GitHubAdmins.ids.any { id -> id == user.attributes["id"] } ||
-                GitHubAdmins.usernames.any { u -> u == user.attributes["login"] }
+                GitHubPermanentUsers.ids.any { id -> id == user.attributes["id"] } ||
+                GitHubPermanentUsers.usernames.any { u -> u == user.attributes["login"] }
             ) {
+                logger.info { loginPermUser }
                 return@OAuth2UserService user
             }
 
             val client = OAuth2AuthorizedClient(request.clientRegistration, user.name, request.accessToken)
-            for (organization in GitHubAdmins.organizations) {
+            for (organization in GitHubPermanentUsers.organizations) {
                 val url = "https://api.github.com/orgs/$organization/members/${user.attributes["login"]}"
-                println(url)
                 val inOrg: HttpStatus? = rest
                     .get()
                     .uri(url)
@@ -66,13 +70,13 @@ class OAuth2UserApprovalHandler {
                     .block()
 
                 if (inOrg == HttpStatus.NO_CONTENT) {
+                    logger.info { loginPermUser }
                     return@OAuth2UserService user
                 }
             }
 
-            for (team in GitHubAdmins.teams) {
+            for (team in GitHubPermanentUsers.teams) {
                 val url = "https://api.github.com/orgs/${team.x}/teams/${team.y}/memberships/${user.attributes["login"]}"
-                println(url)
                 val inTeam: HttpStatus? = rest
                     .get()
                     .uri(url)
@@ -82,12 +86,14 @@ class OAuth2UserApprovalHandler {
                     .block()
 
                 if (inTeam == HttpStatus.OK) {
+                    logger.info { loginPermUser }
                     return@OAuth2UserService user
                 }
             }
 
             // TODO: Handle db users
 
+            logger.warn { "A user ${user.attributes["login"]} with id ${user.name} tried to log in, but did not have permission." }
             throw OAuth2AuthenticationException(
                 OAuth2Error(
                     "invalid_token",

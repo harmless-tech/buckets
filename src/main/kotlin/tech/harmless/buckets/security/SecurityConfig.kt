@@ -28,9 +28,9 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             }
             .logout { logout ->
                 logout
-                    .logoutRequestMatcher(AntPathRequestMatcher("/logout"))
+                    .logoutRequestMatcher(AntPathRequestMatcher("/logout/oauth2"))
                     .logoutSuccessUrl("/").permitAll()
-                    .deleteCookies("JSESSIONID")
+                    .deleteCookies("JSESSIONID", "TOKENAUTHID")
                     .invalidateHttpSession(true)
                     .clearAuthentication(true)
             }

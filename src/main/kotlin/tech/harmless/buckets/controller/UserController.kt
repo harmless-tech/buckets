@@ -12,10 +12,30 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.ResponseBody
 import tech.harmless.buckets.util.Role
+import javax.servlet.http.Cookie
+import javax.servlet.http.HttpServletResponse
 
 @Controller
-@Secured(Role.USER, Role.ADMIN)
+@Secured(Role.USER)
 class UserController {
+
+    @GetMapping("/login")
+    @Secured(Role.ANONYMOUS, Role.USER)
+    fun login(model: Model): String {
+        return "user/login"
+    }
+
+    @GetMapping("/logout")
+    @Secured(Role.ANONYMOUS, Role.USER)
+    fun logout(response: HttpServletResponse) {
+        val cookie = Cookie("TOKENAUTHID", null)
+        cookie.maxAge = 0
+        cookie.secure = false // TODO: Should this be true?
+        cookie.path = "/"
+
+        response.addCookie(cookie)
+        response.sendRedirect("/logout/oauth2")
+    }
 
     @GetMapping("/user")
     fun getUser(@AuthenticationPrincipal principal: OAuth2User, model: ModelMap): String {
@@ -27,11 +47,5 @@ class UserController {
     @ResponseBody
     fun getUserJson(@AuthenticationPrincipal principal: OAuth2User): Map<String, Any> {
         return principal.attributes
-    }
-
-    @GetMapping("/login")
-    @Secured(Role.ANONYMOUS, Role.USER, Role.ADMIN)
-    fun login(model: Model): String {
-        return "user/login"
     }
 }
